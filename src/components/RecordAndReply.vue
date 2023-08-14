@@ -238,7 +238,7 @@ function startRecording() {
       stopButtonShown.value = true
       statusText.value = 'Tallennus käynnissä'
       statusClass.value = 'red-bg'
-      mediaRecorder.addEventListener('dataavailable', function(event) {
+      mediaRecorder.addEventListener('dataavailable', function(event: any) {
         chunks.push(event.data);
       });
 
