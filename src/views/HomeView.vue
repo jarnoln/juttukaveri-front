@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import RecordAndReply from '../components/RecordAndReply.vue'
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    <RecordAndReply />
   </main>
 </template>
