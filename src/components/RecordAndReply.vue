@@ -63,6 +63,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
+import axios from 'axios'
 
 interface ChatLine {
   type: string,
@@ -93,26 +94,35 @@ let status = 'ready'
 let chunks: any[] = []
 let echo = ''
 
+let server = import.meta.env.VITE_BACKEND_URL
+if (!server) {
+  server = 'http://127.0.0.1:8000'
+}
+
+const apiClient = axios.create({
+  baseURL: server,
+  timeout: 10000,
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  }
+})
+
 function enableRecord() {
   startButtonEnabled.value = true
 }
 
 function startSession() {
-  const url = '/api01/start_session';
-  const formData = new FormData();
-  console.log('startSession url:', url);
-  /* fetch(url, {
-    method: 'POST',
-    body: formData,
-  })
+  const path = '/api01/start_session'
+  const formData = new FormData()
+  console.log('startSession path:', path)
+  apiClient.post(path, formData)
   .then(function(response) {
-    return response.json();
-  })
-  .then(function(data) {
-    console.log(data)
-    sessionId = data['id']
+    console.log(response)
+    console.log(response.data)
+    sessionId = response.data['id']
     console.log('sessionId', sessionId)
-  }) */
+  })
 }
 
 function playGreeting() {
@@ -175,7 +185,7 @@ function beginChat() {
   messages = initializeContext(language.value)
 }
 
-function submitRecording(audioBlob: any) {
+function submitRecording(audioBlob: Blob) {
   playWaitASecond()
   const formData = new FormData()
   formData.append('audio', audioBlob)
@@ -183,46 +193,46 @@ function submitRecording(audioBlob: any) {
   formData.append('echo', echo)
   formData.append('language', language.value)
   formData.append('session', sessionId)
-  const url = '/api01/submit_audio'
-  console.log('submitAudio url:', url)
+  const path = '/api01/submit_audio'
+  console.log('submitAudio url:', path)
   console.log('data:', formData)
-  /* fetch(url, {
+  fetch(server + path, {
     method: 'POST',
     body: formData,
   })
   .then(function(response) {
-    return response.json();
+    console.log(response)
+    return response.json()
   })
   .then(function(data) {
     console.log(data)
-    const transcription = data['transcript'];
-    const responseText = data['responseText'];
-    console.log('Transcription:', transcription);
-    document.getElementById('statusText').innerHTML = 'Valmis';
-    startButton.removeAttribute('hidden');
-    startButton.setAttribute('disabled', '');
-    stopButton.removeAttribute('disabled');
-    stopButton.setAttribute('hidden', '');
-    const transcribedContainer = document.createElement("p");
-    transcribedContainer.classList.add('transcribed')
-    transcribedContainer.innerHTML = transcription;
-    const responseContainer = document.createElement("p");
-    responseContainer.classList.add('response')
-    responseContainer.innerHTML = responseText;
-    chatBox.prepend(transcribedContainer);
-    chatBox.prepend(responseContainer);
+    const transcription = data['transcript']
+    const responseText = data['responseText']
+    console.log('Transcription:', transcription)
+    startButtonShown.value = true
+    startButtonEnabled.value = false
+    stopButtonEnabled.value = true
+    stopButtonShown.value = false
+    chatLog.value.push({
+      type: 'transcribed',
+      text: transcription
+    })
+    chatLog.value.push({
+      type: 'response',
+      text: responseText
+    })
 
     messages.push({ 'role': 'user', 'content': transcription })
     messages.push({ 'role': 'assistant', 'content': responseText })
     playResponse(data['audioUrl']);
     console.log(messages);
-    status = 'ready';
-    document.getElementById('statusText').innerHTML = 'Valmis';
+    status = 'ready'
+    statusText.value = 'Valmis'
   })
   .catch(function(error) {
     console.error('Error:', error);
     status = 'error';
-  }); */
+  })
 }
 
 function startRecording() {
