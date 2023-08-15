@@ -43,7 +43,8 @@
       <button class="right"
               id="clearContextButton"
               title="Poistaa kontekstin, jossa ChatGPT alustetaan vastaamaan lapselle. Sen sijaan se vastaa kuten normaalisti aikuisille."
-              :disabled="!clearContextButtonEnabled">
+              :disabled="!clearContextButtonEnabled"
+              @click="clearContext">
         Poista alustus lapselle
       </button>
       <label for="selectLanguageMenu">Valitse kieli:</label>
