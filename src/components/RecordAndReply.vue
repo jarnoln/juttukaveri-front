@@ -48,7 +48,7 @@
         Poista alustus lapselle
       </button>
       <label for="selectLanguageMenu">Valitse kieli:</label>
-      <select name="language" id="selectLanguageMenu">
+      <select name="language" id="selectLanguageMenu" v-model="currentLanguage">
         <option value="fi-FI">Suomi</option>
         <option value="en-US">English</option>
         <option value="cmn-CN">Mandarin</option>
@@ -63,13 +63,14 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
+import { onBeforeMount, ref, watch } from 'vue'
 import axios from 'axios'
 import { useContextStore } from '@/stores/context'
 
 
 const contextStore = useContextStore()
 
+const currentLanguage = ref('')
 const statusText = ref('Valmis')
 const statusClass = ref('white-bg')
 const beginChatButtonShown = ref(true)
@@ -101,7 +102,12 @@ const apiClient = axios.create({
 })
 
 onBeforeMount(() => {
+  currentLanguage.value = 'fi-FI'
   contextStore.setLanguage('fi-FI')
+})
+
+watch(currentLanguage, function(newValue) {
+  contextStore.setLanguage(newValue)
 })
 
 function enableRecord() {

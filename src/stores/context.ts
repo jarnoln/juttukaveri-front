@@ -13,6 +13,7 @@ export const useContextStore = defineStore('context', {
       this.chatLog = []
     },
     setLanguage(language: string) {
+      console.log('contextStore::setLanguage: ', language)
       this.language = language
     },
     initializeContext() {
