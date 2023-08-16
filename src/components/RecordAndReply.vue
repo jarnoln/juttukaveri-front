@@ -63,22 +63,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeMount, ref, watch } from 'vue'
 import axios from 'axios'
+import { useContextStore } from '@/stores/context'
+import { type ChatLine, type Message } from  '@/types'
 
-interface ChatLine {
-  type: string,
-  text: string
-}
 
-interface Message {
-  role: string,
-  content: string
-}
+const contextStore = useContextStore()
 
 const statusText = ref('Valmis')
 const statusClass = ref('white-bg')
-const language = ref('fi-FI')
 const chatLog = ref<ChatLine[]>([])
 const beginChatButtonShown = ref(true)
 const startButtonShown = ref(false)
@@ -107,6 +101,10 @@ const apiClient = axios.create({
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   }
+})
+
+onBeforeMount(() => {
+  contextStore.setLanguage('fi-FI')
 })
 
 function enableRecord() {
@@ -183,7 +181,7 @@ function beginChat() {
     pysäytysnappia lopettaaksesi nauhoituksen. Vaihtoehtoisesti voit aloittaa nauhoituksen painamalla välilyönnin
     pohjaan ja päästää sen ylös, kun olet valmis. Sen jälkeen tallenne lähetetään ChatGPT:lle ja jonkin ajan kuluttua
     pitäisi kuulua vastaus.`
-  messages = initializeContext(language.value)
+  messages = initializeContext(contextStore.language)
 }
 
 function submitRecording(audioBlob: Blob) {
@@ -192,7 +190,7 @@ function submitRecording(audioBlob: Blob) {
   formData.append('audio', audioBlob)
   formData.append('messages', JSON.stringify(messages))
   formData.append('echo', echo)
-  formData.append('language', language.value)
+  formData.append('language', contextStore.language)
   formData.append('session', sessionId)
   const path = '/api01/submit_audio'
   console.log('submitAudio url:', path)
