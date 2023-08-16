@@ -6,7 +6,7 @@
 
     <p id="instructions">{{ instructions }}</p>
 
-    <div id="settings" class="settingsTable">
+    <div id="settings" v-if="state === 'setup'" class="settingsTable">
       <div class="settingRow">
         <label for="selectLanguageMenu">Valitse kieli:</label>
         <select name="language" id="selectLanguageMenu" v-model="currentLanguage">
@@ -74,7 +74,7 @@ import { useContextStore } from '@/stores/context'
 const contextStore = useContextStore()
 
 const currentLanguage = ref('')
-const statusText = ref('Valmis')
+const statusText = ref('')
 const statusClass = ref('white-bg')
 const beginChatButtonShown = ref(true)
 const startButtonShown = ref(false)
@@ -87,10 +87,8 @@ const instructions = ref('Tämä on äänikäyttöliittymä OpenAI:n ChatGPT:lle
 let audioContext: any
 let mediaRecorder: any
 let sessionId = ''
-let status = 'ready'
 let chunks: any[] = []
-
-
+let state = 'setup'
 let server = import.meta.env.VITE_BACKEND_URL
 if (!server) {
   server = 'http://127.0.0.1:8000'
@@ -114,8 +112,42 @@ watch(currentLanguage, function(newValue) {
   contextStore.setLanguage(newValue)
 })
 
-function enableRecord() {
-  startButtonEnabled.value = true
+function setState(newState: string) {
+  /* states:
+      setup
+      playback - Playing greeting or response
+      ready: -Waiting for user to start recording
+      recording: 
+      processing: - Waiting for response from server
+  */
+  state = newState
+  if (state == 'playback') {
+    beginChatButtonShown.value = false
+    startButtonShown.value = true
+    startButtonEnabled.value = false
+    stopButtonShown.value = false
+    statusText.value = 'Odota'
+  } else if (state == 'ready') {
+    beginChatButtonShown.value = false
+    startButtonShown.value = true
+    startButtonEnabled.value = true
+    statusText.value = 'Valmis'
+    statusClass.value = 'white-bg'
+  } else if (state == 'recording') {
+    startButtonShown.value = false
+    stopButtonShown.value = true
+    stopButtonEnabled.value = true
+    statusText.value = 'Tallennus käynnissä'
+    statusClass.value = 'red-bg'
+  } else if (state == 'processing') {
+    stopButtonEnabled.value = false
+    statusText.value = 'Odota hetki, kun mietin.'
+    statusClass.value = 'white-bg'
+  }
+}
+
+function playResponseEnded() {
+  setState('ready')
 }
 
 function startSession() {
@@ -135,7 +167,7 @@ function playGreeting() {
   const audioUrl = 'https://public-bucket-jk.s3.eu-central-1.amazonaws.com/hei_kuka_sina_olet.mp3'
   const audio = new Audio(audioUrl)
   startButtonEnabled.value = false
-  audio.addEventListener('ended', enableRecord)
+  audio.addEventListener('ended', playResponseEnded)
   audio.play()
 }
 
@@ -147,20 +179,19 @@ function playWaitASecond() {
 
 function playResponse(audioUrl: string) {
   const audio = new Audio(audioUrl);
-  audio.addEventListener('ended', enableRecord)
+  audio.addEventListener('ended', playResponseEnded)
   audio.play();
 }
 
 function beginChat() {
   console.log('beginChat')
+  setState('playback')
   playGreeting();
   startSession();
-  beginChatButtonShown.value = false
-  startButtonShown.value = true
   instructions.value = `Paina alla olevaa nappia aloittaaksesi nauhoituksen ja kun olet valmis, paina
-    pysäytysnappia lopettaaksesi nauhoituksen. Vaihtoehtoisesti voit aloittaa nauhoituksen painamalla välilyönnin
-    pohjaan ja päästää sen ylös, kun olet valmis. Sen jälkeen tallenne lähetetään ChatGPT:lle ja jonkin ajan kuluttua
-    pitäisi kuulua vastaus.`
+      pysäytysnappia lopettaaksesi nauhoituksen. Vaihtoehtoisesti voit aloittaa nauhoituksen painamalla välilyönnin
+      pohjaan ja päästää sen ylös, kun olet valmis. Sen jälkeen tallenne lähetetään ChatGPT:lle ja jonkin ajan kuluttua
+      pitäisi kuulua vastaus.`
   contextStore.initializeContext(character.value)
 }
 
@@ -188,18 +219,13 @@ function submitRecording(audioBlob: Blob) {
     const transcription = data['transcript']
     const responseText = data['responseText']
     console.log('Transcription:', transcription)
-    startButtonShown.value = true
-    startButtonEnabled.value = false
-    stopButtonEnabled.value = true
-    stopButtonShown.value = false
     contextStore.addChatLine({ type: 'transcribed', text: transcription })
     contextStore.addChatLine({ type: 'response', text: responseText })
     contextStore.addMessage({ 'role': 'user', 'content': transcription })
     contextStore.addMessage({ 'role': 'assistant', 'content': responseText })
+    setState('playback')
     playResponse(data['audioUrl']);
     console.log(contextStore.messages);
-    status = 'ready'
-    statusText.value = 'Valmis'
   })
   .catch(function(error) {
     console.error('Error:', error);
@@ -215,20 +241,14 @@ function startRecording() {
         mimeType: "audio/webm"
       }
       mediaRecorder = new MediaRecorder(stream, options)
+      setState('recording')
       status = 'recording'
-      startButtonShown.value = false
-      stopButtonShown.value = true
-      statusText.value = 'Tallennus käynnissä'
-      statusClass.value = 'red-bg'
       mediaRecorder.addEventListener('dataavailable', function(event: any) {
         chunks.push(event.data);
       });
 
       mediaRecorder.addEventListener('stop', function() {
-        status = 'processing';
-        stopButtonEnabled.value = false
-        statusText.value = 'Odota hetki, kun mietin.'
-        statusClass.value = 'white-bg'
+        setState('processing')
         const audioBlob = new Blob(chunks, { type: 'audio/mpeg' });
         // const audioURL = URL.createObjectURL(audioBlob);
         // const audio = new Audio(audioURL);
@@ -255,7 +275,7 @@ function stopRecording() {
 function keyDownHandler(event: any) {
   console.log('Pressed key', event.code)
   if (event.code === 'Space') {
-    if (status === 'ready') {
+    if (state === 'ready') {
       startRecording()
     }
   }
@@ -264,7 +284,7 @@ function keyDownHandler(event: any) {
 function keyUpHandler(event: any) {
   console.log('Released key', event.code)
   if (event.code === 'Space') {
-    if (status === 'recording') {
+    if (state === 'recording') {
       stopRecording()
     }
   }
