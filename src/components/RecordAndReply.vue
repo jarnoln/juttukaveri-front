@@ -83,7 +83,6 @@ const clearContextButtonEnabled = ref(false)
 const instructions = ref('Tämä on äänikäyttöliittymä OpenAI:n ChatGPT:lle. Suunnattu lähinnä lapsille, koska tekstikäyttöliittymä on hieman hankala, jos ei osaa vielä lukea tai kirjoittaa. Paina alla olevaa nappia aloittaaksesi.')
 let audioContext: any
 let mediaRecorder: any
-let messages: Message[] = []
 let sessionId = ''
 let status = 'ready'
 let chunks: any[] = []
@@ -181,14 +180,14 @@ function beginChat() {
     pysäytysnappia lopettaaksesi nauhoituksen. Vaihtoehtoisesti voit aloittaa nauhoituksen painamalla välilyönnin
     pohjaan ja päästää sen ylös, kun olet valmis. Sen jälkeen tallenne lähetetään ChatGPT:lle ja jonkin ajan kuluttua
     pitäisi kuulua vastaus.`
-  messages = initializeContext(contextStore.language)
+  contextStore.initializeContext()
 }
 
 function submitRecording(audioBlob: Blob) {
   playWaitASecond()
   const formData = new FormData()
   formData.append('audio', audioBlob)
-  formData.append('messages', JSON.stringify(messages))
+  formData.append('messages', JSON.stringify(contextStore.messages))
   formData.append('echo', echo)
   formData.append('language', contextStore.language)
   formData.append('session', sessionId)
@@ -221,10 +220,10 @@ function submitRecording(audioBlob: Blob) {
       text: responseText
     })
 
-    messages.push({ 'role': 'user', 'content': transcription })
-    messages.push({ 'role': 'assistant', 'content': responseText })
+    contextStore.addMessage({ 'role': 'user', 'content': transcription })
+    contextStore.addMessage({ 'role': 'assistant', 'content': responseText })
     playResponse(data['audioUrl']);
-    console.log(messages);
+    console.log(contextStore.messages);
     status = 'ready'
     statusText.value = 'Valmis'
   })
@@ -298,7 +297,7 @@ function keyUpHandler(event: any) {
 }
 
 function clearContext() {
-  messages = []
+  contextStore.clear()
 }
 
 </script>
