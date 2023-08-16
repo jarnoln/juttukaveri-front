@@ -10,6 +10,7 @@ export const useContextStore = defineStore('context', {
   actions: {
     clear() {
       this.messages = []
+      this.chatLog = []
     },
     setLanguage(language: string) {
       this.language = language
@@ -40,6 +41,9 @@ export const useContextStore = defineStore('context', {
     },
     addMessage(message: Message) {
       this.messages.push(message)
+    },
+    addChatLine(line: ChatLine) {
+      this.chatLog.push(line)
     }
   }
 })

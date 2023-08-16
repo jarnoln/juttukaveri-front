@@ -55,7 +55,7 @@
       </select>
     </p>
     <div id="chatBox">
-      <p v-for="line in chatLog" :class="line.type">
+      <p v-for="line in contextStore.chatLog" :class="line.type">
         {{ line.text }}
       </p>
     </div>
@@ -63,17 +63,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, ref, watch } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import axios from 'axios'
 import { useContextStore } from '@/stores/context'
-import { type ChatLine, type Message } from  '@/types'
 
 
 const contextStore = useContextStore()
 
 const statusText = ref('Valmis')
 const statusClass = ref('white-bg')
-const chatLog = ref<ChatLine[]>([])
 const beginChatButtonShown = ref(true)
 const startButtonShown = ref(false)
 const stopButtonShown = ref(false)
@@ -143,32 +141,6 @@ function playResponse(audioUrl: string) {
   audio.play();
 }
 
-function initializeContext(language: string) {
-  const age = 3
-  let greet = ''
-  let context = ''
-  if (language === 'en-US') {
-    greet = 'Hello! Who are you?'
-    context = `You are a friendly kindergarten teacher. You are chatting with ${age} year old child.`
-  } else if (language === 'fi-FI') {
-    greet = 'Hei! Kuka sinä olet?'
-    context = `Olet ystävällinen lastenopettaja. Keskustelet ${age}-vuotiaan lapsen kanssa.
-      Pidä vastaukset lyhyinä ja yksinkertaisina, lapsella on lyhyt keskittymiskyky eikä
-      jaksa kuunnella kovin pitkiä vastauksia.
-      Vältä vaikeita sanoja.`
-  }
-  chatLog.value.push({
-    type: 'response',
-    text: greet
-  })
-
-  console.log('Initialized context:', context)
-  return [
-    {'role': 'system', 'content': context},
-    {'role': 'assistant', 'content': greet},
-  ];
-}
-
 function beginChat() {
   console.log('beginChat')
   playGreeting();
@@ -211,15 +183,8 @@ function submitRecording(audioBlob: Blob) {
     startButtonEnabled.value = false
     stopButtonEnabled.value = true
     stopButtonShown.value = false
-    chatLog.value.push({
-      type: 'transcribed',
-      text: transcription
-    })
-    chatLog.value.push({
-      type: 'response',
-      text: responseText
-    })
-
+    contextStore.addChatLine({ type: 'transcribed', text: transcription })
+    contextStore.addChatLine({ type: 'response', text: responseText })
     contextStore.addMessage({ 'role': 'user', 'content': transcription })
     contextStore.addMessage({ 'role': 'assistant', 'content': responseText })
     playResponse(data['audioUrl']);
