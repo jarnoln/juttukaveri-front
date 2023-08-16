@@ -23,8 +23,8 @@
         </select>
       </div>
       <div class="settingRow">
-        <label for="echoCheckbox">Kaiku</label>
-        <input type="checkbox" id="echoCheckbox" checked=false name="echo">
+        <label for="echoCheckbox">Kaiutus</label>
+        <input type="checkbox" id="echoCheckbox" checked=false name="echo" v-model="echo">
         <div class="settingDescription">Vain toistaa, mitä kuulee. Ei käytä ChatGPT:tä.</div>
       </div>
     </div>
@@ -82,13 +82,14 @@ const stopButtonShown = ref(false)
 const startButtonEnabled = ref(true)
 const stopButtonEnabled = ref(true)
 const character = ref('teacher')
+const echo = ref(false)
 const instructions = ref('Tämä on äänikäyttöliittymä OpenAI:n ChatGPT:lle. Suunnattu lähinnä lapsille, koska tekstikäyttöliittymä on hieman hankala, jos ei osaa vielä lukea tai kirjoittaa. Paina alla olevaa nappia aloittaaksesi.')
 let audioContext: any
 let mediaRecorder: any
 let sessionId = ''
 let status = 'ready'
 let chunks: any[] = []
-let echo = ''
+
 
 let server = import.meta.env.VITE_BACKEND_URL
 if (!server) {
@@ -168,7 +169,7 @@ function submitRecording(audioBlob: Blob) {
   const formData = new FormData()
   formData.append('audio', audioBlob)
   formData.append('messages', JSON.stringify(contextStore.messages))
-  formData.append('echo', echo)
+  formData.append('echo', echo.value == true ? 'yes' : '')
   formData.append('language', contextStore.language)
   formData.append('session', sessionId)
   const path = '/api01/submit_audio'
