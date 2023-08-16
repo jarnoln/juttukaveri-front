@@ -291,6 +291,8 @@ function keyDownHandler(event: any) {
   if (event.code === 'Space') {
     if (state === 'ready') {
       startRecording()
+    } else if (state === 'setup') {
+      beginChat()
     }
   }
 }
@@ -303,6 +305,9 @@ function keyUpHandler(event: any) {
     }
   }
 }
+
+document.addEventListener("keydown", keyDownHandler);
+document.addEventListener("keyup", keyUpHandler);
 </script>
 
 <style scoped>
