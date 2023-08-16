@@ -149,6 +149,14 @@ function setState(newState: string) {
     stopButtonEnabled.value = false
     statusText.value = 'Odota hetki, kun mietin.'
     statusClass.value = 'white-bg'
+  } else if (state == 'error') {
+    statusText.value = 'Virhetilanne'
+    statusClass.value = 'red-bg'
+    startButtonEnabled.value = false
+  } else {
+    console.warn('Unknown state:', state)
+    statusText.value = state
+    statusClass.value = 'red-bg'
   }
 }
 
@@ -235,7 +243,8 @@ function submitRecording(audioBlob: Blob) {
   })
   .catch(function(error) {
     console.error('Error:', error);
-    status = 'error';
+    setState('error')
+    statusText.value = 'Error submitting recording:' + error
   })
 }
 
@@ -248,7 +257,6 @@ function startRecording() {
       }
       mediaRecorder = new MediaRecorder(stream, options)
       setState('recording')
-      status = 'recording'
       mediaRecorder.addEventListener('dataavailable', function(event: any) {
         chunks.push(event.data);
       });
@@ -266,14 +274,14 @@ function startRecording() {
       mediaRecorder.start();
     })
     .catch(function(error) {
-      statusText.value = 'Error accessing microphone:' + error
       console.error('Error accessing microphone:', error);
+      setState('error')
+      statusText.value = 'Error accessing microphone:' + error
     });
 }
 
 function stopRecording() {
   mediaRecorder.stop();
-  status = 'stopped';
   chunks = [];
   audioContext.close();
 }
