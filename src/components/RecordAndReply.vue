@@ -22,6 +22,10 @@
           <option value="none">Ei roolia</option>
         </select>
       </div>
+      <div class="settingRow" v-if="character == 'teacher'">
+        <label for="inputAge">Lapsen ikä:</label>
+        <input type="number" min="1" max="18" name="age" id="inputAge" v-model="age" />
+      </div>
       <div class="settingRow">
         <label for="echoCheckbox">Kaiutus</label>
         <input type="checkbox" id="echoCheckbox" checked=false name="echo" v-model="echo">
@@ -82,6 +86,7 @@ const stopButtonShown = ref(false)
 const startButtonEnabled = ref(true)
 const stopButtonEnabled = ref(true)
 const character = ref('teacher')
+const age = ref(3)
 const echo = ref(false)
 const instructions = ref('Tämä on äänikäyttöliittymä OpenAI:n ChatGPT:lle. Suunnattu lähinnä lapsille, koska tekstikäyttöliittymä on hieman hankala, jos ei osaa vielä lukea tai kirjoittaa. Paina alla olevaa nappia aloittaaksesi.')
 let audioContext: any
@@ -120,6 +125,7 @@ function setState(newState: string) {
       recording: 
       processing: - Waiting for response from server
   */
+  console.log('setState:', newState)
   state = newState
   if (state == 'playback') {
     beginChatButtonShown.value = false
@@ -192,7 +198,7 @@ function beginChat() {
       pysäytysnappia lopettaaksesi nauhoituksen. Vaihtoehtoisesti voit aloittaa nauhoituksen painamalla välilyönnin
       pohjaan ja päästää sen ylös, kun olet valmis. Sen jälkeen tallenne lähetetään ChatGPT:lle ja jonkin ajan kuluttua
       pitäisi kuulua vastaus.`
-  contextStore.initializeContext(character.value)
+  contextStore.initializeContext(character.value, age.value)
 }
 
 function submitRecording(audioBlob: Blob) {

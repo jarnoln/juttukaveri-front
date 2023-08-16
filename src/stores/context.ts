@@ -16,8 +16,7 @@ export const useContextStore = defineStore('context', {
       console.log('contextStore::setLanguage: ', language)
       this.language = language
     },
-    initializeContext(character: string) {
-      const age = 3
+    initializeContext(character: string, age: number) {
       let greet = ''
       let context = ''
       if (character == 'teacher') {
