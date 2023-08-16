@@ -16,29 +16,33 @@ export const useContextStore = defineStore('context', {
       console.log('contextStore::setLanguage: ', language)
       this.language = language
     },
-    initializeContext() {
+    initializeContext(character: string) {
       const age = 3
       let greet = ''
       let context = ''
-      if (this.language === 'en-US') {
-        greet = 'Hello! Who are you?'
-        context = `You are a friendly kindergarten teacher. You are chatting with ${age} year old child.`
-      } else if (this.language === 'fi-FI') {
-        greet = 'Hei! Kuka sinä olet?'
-        context = `Olet ystävällinen lastenopettaja. Keskustelet ${age}-vuotiaan lapsen kanssa.
-          Pidä vastaukset lyhyinä ja yksinkertaisina, lapsella on lyhyt keskittymiskyky eikä
-          jaksa kuunnella kovin pitkiä vastauksia.
-          Vältä vaikeita sanoja.`
+      if (character == 'teacher') {
+        if (this.language === 'en-US') {
+          greet = 'Hello! Who are you?'
+          context = `You are a friendly kindergarten teacher. You are chatting with ${age} year old child.`
+        } else if (this.language === 'fi-FI') {
+          greet = 'Hei! Kuka sinä olet?'
+          context = `Olet ystävällinen lastenopettaja. Keskustelet ${age}-vuotiaan lapsen kanssa.
+            Pidä vastaukset lyhyinä ja yksinkertaisina, lapsella on lyhyt keskittymiskyky eikä
+            jaksa kuunnella kovin pitkiä vastauksia.
+            Vältä vaikeita sanoja.`
+        }
       }
-      this.chatLog.push({
-        type: 'response',
-        text: greet
-      })
+      if (greet) {
+        this.chatLog.push({
+          type: 'response',
+          text: greet
+        })
+      }
       console.log('Initialized context:', context)
-      this.messages = [
-        {'role': 'system', 'content': context},
-        {'role': 'assistant', 'content': greet},
-      ]
+      this.messages = [{'role': 'system', 'content': context}]
+      if (greet) {
+        this.messages.push({'role': 'assistant', 'content': greet})
+      }
     },
     addMessage(message: Message) {
       this.messages.push(message)

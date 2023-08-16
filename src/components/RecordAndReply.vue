@@ -5,6 +5,30 @@
     <h2 id="statusText" :class="statusClass">{{ statusText }}</h2>
 
     <p id="instructions">{{ instructions }}</p>
+
+    <div id="settings" class="settingsTable">
+      <div class="settingRow">
+        <label for="selectLanguageMenu">Valitse kieli:</label>
+        <select name="language" id="selectLanguageMenu" v-model="currentLanguage">
+          <option value="fi-FI">Suomi</option>
+          <option value="en-US">English</option>
+          <option value="cmn-CN">Mandarin</option>
+        </select>
+      </div>
+      <div class="settingRow">
+        <label for="selectCharacterMenu">Valitse rooli:</label>
+        <select name="character" id="selectCharacterMenu" v-model="character">
+          <option value="teacher">Päiväkodin opettaja</option>
+          <option value="none">Ei roolia</option>
+        </select>
+      </div>
+      <div class="settingRow">
+        <label for="echoCheckbox">Kaiku</label>
+        <input type="checkbox" id="echoCheckbox" checked=false name="echo">
+        <div class="settingDescription">Vain toistaa, mitä kuulee. Ei käytä ChatGPT:tä.</div>
+      </div>
+    </div>
+
     <p>
       <button
         class="largeButton"
@@ -33,27 +57,6 @@
         Lopeta nauhoitus
       </button>
     </p>
-    <p>
-      <span style="margin-right: 5rem">
-        <input type="checkbox" id="echoCheckbox" checked=false name="echo">
-        <label for="echoCheckbox">Kaiku</label>
-        <span> - Vain toistaa, mitä kuulee. Ei käytä ChatGPT:tä.</span>
-      </span>
-      <button class="right" id="playButton">Toista alkutervehdys</button>
-      <button class="right"
-              id="clearContextButton"
-              title="Poistaa kontekstin, jossa ChatGPT alustetaan vastaamaan lapselle. Sen sijaan se vastaa kuten normaalisti aikuisille."
-              :disabled="!clearContextButtonEnabled"
-              @click="clearContext">
-        Poista alustus lapselle
-      </button>
-      <label for="selectLanguageMenu">Valitse kieli:</label>
-      <select name="language" id="selectLanguageMenu" v-model="currentLanguage">
-        <option value="fi-FI">Suomi</option>
-        <option value="en-US">English</option>
-        <option value="cmn-CN">Mandarin</option>
-      </select>
-    </p>
     <div id="chatBox">
       <p v-for="line in contextStore.chatLog" :class="line.type">
         {{ line.text }}
@@ -78,7 +81,7 @@ const startButtonShown = ref(false)
 const stopButtonShown = ref(false)
 const startButtonEnabled = ref(true)
 const stopButtonEnabled = ref(true)
-const clearContextButtonEnabled = ref(false)
+const character = ref('teacher')
 const instructions = ref('Tämä on äänikäyttöliittymä OpenAI:n ChatGPT:lle. Suunnattu lähinnä lapsille, koska tekstikäyttöliittymä on hieman hankala, jos ei osaa vielä lukea tai kirjoittaa. Paina alla olevaa nappia aloittaaksesi.')
 let audioContext: any
 let mediaRecorder: any
@@ -153,12 +156,11 @@ function beginChat() {
   startSession();
   beginChatButtonShown.value = false
   startButtonShown.value = true
-  clearContextButtonEnabled.value = true
   instructions.value = `Paina alla olevaa nappia aloittaaksesi nauhoituksen ja kun olet valmis, paina
     pysäytysnappia lopettaaksesi nauhoituksen. Vaihtoehtoisesti voit aloittaa nauhoituksen painamalla välilyönnin
     pohjaan ja päästää sen ylös, kun olet valmis. Sen jälkeen tallenne lähetetään ChatGPT:lle ja jonkin ajan kuluttua
     pitäisi kuulua vastaus.`
-  contextStore.initializeContext()
+  contextStore.initializeContext(character.value)
 }
 
 function submitRecording(audioBlob: Blob) {
@@ -266,11 +268,6 @@ function keyUpHandler(event: any) {
     }
   }
 }
-
-function clearContext() {
-  contextStore.clear()
-}
-
 </script>
 
 <style scoped>
@@ -313,5 +310,24 @@ button:disabled {
 #stopButton {
   background-color: #cc0000;
   border: 2px solid #cc0000;
+}
+
+div.settingsTable {
+  display: table;
+}
+
+div.settingRow {
+  display: table-row;
+}
+
+label, input, select {
+  display: table-cell;
+  text-align: left;
+  margin-bottom: 1rem;
+  margin-left: 1rem;
+}
+
+div.settingDescription {
+  display: table-cell;
 }
 </style>
