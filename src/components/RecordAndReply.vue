@@ -71,9 +71,8 @@
 
 <script setup lang="ts">
 import { onBeforeMount, ref, watch } from 'vue'
-import axios from 'axios'
 import { useContextStore } from '@/stores/context'
-
+import { apiClient } from '@/backend'
 
 const contextStore = useContextStore()
 
@@ -99,14 +98,6 @@ if (!server) {
   server = 'http://127.0.0.1:8000'
 }
 
-const apiClient = axios.create({
-  baseURL: server,
-  timeout: 10000,
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
-})
 
 onBeforeMount(() => {
   currentLanguage.value = 'fi-FI'
