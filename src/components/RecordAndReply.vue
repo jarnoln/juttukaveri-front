@@ -87,7 +87,7 @@ const stopButtonEnabled = ref(true)
 const character = ref('teacher')
 const age = ref(3)
 const echo = ref(false)
-const instructions = ref('Tämä on äänikäyttöliittymä OpenAI:n ChatGPT:lle. Suunnattu lähinnä lapsille, koska tekstikäyttöliittymä on hieman hankala, jos ei osaa vielä lukea tai kirjoittaa. Paina alla olevaa nappia aloittaaksesi.')
+const instructions = ref('Tämä on äänikäyttöliittymä OpenAI:n ChatGPT:lle. Suunnattu lähinnä lapsille, koska tekstikäyttöliittymä on hieman hankala, jos ei osaa vielä lukea tai kirjoittaa.')
 let audioContext: any
 let mediaRecorder: any
 let sessionId = ''
@@ -302,6 +302,10 @@ document.addEventListener("keyup", keyUpHandler);
 </script>
 
 <style scoped>
+#content {
+  padding: 0rem 2rem 0rem 2rem;
+}
+
 .red-bg {
   background-color: #ff2222;
 }
