@@ -112,9 +112,9 @@ function setState(newState: string) {
   /* states:
       setup
       playback - Playing greeting or response
-      ready: -Waiting for user to start recording
-      recording: 
-      processing: - Waiting for response from server
+      ready - Waiting for user to start recording
+      recording
+      processing - Waiting for response from server
   */
   console.log('setState:', newState)
   state = newState
