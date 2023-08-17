@@ -1,12 +1,12 @@
 <template>
-    <div v-for="session in sessions">
+    <div v-for="session in sessions" class="session">
       {{ session.created }}
       {{ session.replies.length }}
       {{ session.transcripts.length }}
       {{ session.ip }}
       {{ session.referer }}
-      <div v-for="entry in getEntries(session)">
-        {{ entry.text }}
+      <div v-for="entry in getEntries(session)" :class="getClass(entry)">
+        {{ entry.type }}: {{ entry.text }}
       </div>
     </div>
 </template>
@@ -17,7 +17,8 @@ import { onBeforeMount, ref } from 'vue'
 
 interface Entry {
   created: string,
-  text: string
+  text: string,
+  type: string | null
 }
 
 interface Session {
@@ -42,8 +43,20 @@ onBeforeMount(() => {
 
 function getEntries(session: any) : Entry[] {
   const entries: Entry[] = []
-  session.transcripts.forEach((element: Entry) => {entries.push(element)});
-  session.replies.forEach((element: Entry) => {entries.push(element)});
+  session.transcripts.forEach((element: Entry) => {
+    entries.push({
+      created: element.created,
+      text: element.text,
+      type: 'U'
+    })
+  });
+  session.replies.forEach((element: Entry) => {
+    entries.push({
+      created: element.created,
+      text: element.text,
+      type: 'C'
+    })
+  });
   entries.sort((a: Entry, b: Entry) => {
     if (a.created > b.created) {
       return 1
@@ -54,12 +67,30 @@ function getEntries(session: any) : Entry[] {
   return entries
 }
 
+function getClass(entry: Entry) : string {
+  if (entry.type == 'C') {
+    return 'reply'
+  }
+  return 'transcript'
+}
 </script>
 
 <style scoped>
 .about {
   margin: 1rem 5rem 1rem 5rem;
   text-align: left;
+}
+
+.reply {
+  background-color: rgb(240, 240, 240);
+}
+
+.transcript {
+  background-color: rgb(220, 220, 220);
+}
+
+.session {
+  background-color: rgb(200, 200, 200);
 }
 
 </style>
