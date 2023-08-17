@@ -15,7 +15,20 @@
 import { apiClient } from '../backend'
 import { onBeforeMount, ref } from 'vue'
 
-const sessions = ref([])
+interface Entry {
+  created: string,
+  text: string
+}
+
+interface Session {
+  created: string,
+  ip: string,
+  referer: string,
+  replies: Entry[],
+  transcripts: Entry[]
+}
+
+const sessions = ref<Session[]>([])
 
 onBeforeMount(() => {
   const path = '/api01/sessions'
@@ -27,11 +40,17 @@ onBeforeMount(() => {
   })
 })
 
-function getEntries(session: any) : [] {
-  const entries: any = []
-  session.transcripts.forEach(element => {entries.push(element)});
-  session.replies.forEach(element => {entries.push(element)});
-  entries.sort((a,b) => { return a.created > b.created })
+function getEntries(session: any) : Entry[] {
+  const entries: Entry[] = []
+  session.transcripts.forEach((element: Entry) => {entries.push(element)});
+  session.replies.forEach((element: Entry) => {entries.push(element)});
+  entries.sort((a: Entry, b: Entry) => {
+    if (a.created > b.created) {
+      return 1
+    } else {
+      return -1
+    }
+  })
   return entries
 }
 
