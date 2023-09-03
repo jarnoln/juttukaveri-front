@@ -15,6 +15,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@intlify/unplugin-vue-i18n": "^0.13.0",
     "axios": "^1.4.0",
     "marked": "^7.0.3",
     "pinia": "^2.1.4",
