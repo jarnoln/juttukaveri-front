@@ -3,12 +3,12 @@
     <ul id="right-links">
       <li>
         <router-link id="navbar-home" active-class="active" :to="{ name: 'home' }">
-          Etusivu
+          {{ $t('Front page') }}
         </router-link>
       </li>
       <li>
         <router-link id="navbar-about" active-class="active" :to="{ name: 'about' }">
-          Tietoja
+          {{ $t('About') }}
         </router-link>
       </li>
     </ul>
