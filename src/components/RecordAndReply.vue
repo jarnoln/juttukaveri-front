@@ -8,7 +8,7 @@
 
     <div id="settings" v-if="state === 'setup'" class="settingsTable">
       <div class="settingRow">
-        <label for="selectLanguageMenu">Valitse kieli:</label>
+        <label for="selectLanguageMenu">{{ t('Choose language') }}:</label>
         <select name="language" id="selectLanguageMenu" v-model="currentLanguage">
           <option value="fi-FI">Suomi</option>
           <option value="en-US">English</option>
@@ -16,20 +16,20 @@
         </select>
       </div>
       <div class="settingRow">
-        <label for="selectCharacterMenu">Valitse rooli:</label>
+        <label for="selectCharacterMenu">{{ t('Choose role') }}:</label>
         <select name="character" id="selectCharacterMenu" v-model="character">
-          <option value="teacher">Päiväkodin opettaja</option>
-          <option value="none">Ei roolia</option>
+          <option value="teacher">{{ t('Kindergarten teacher') }}</option>
+          <option value="none">{{ t('No role') }}</option>
         </select>
       </div>
       <div class="settingRow" v-if="character == 'teacher'">
-        <label for="inputAge">Lapsen ikä:</label>
+        <label for="inputAge">{{ t('Age of child') }}:</label>
         <input type="number" min="1" max="18" name="age" id="inputAge" v-model="age" />
       </div>
       <div class="settingRow">
         <label for="echoCheckbox">{{ t('Echo') }}</label>
         <input type="checkbox" id="echoCheckbox" checked=false name="echo" v-model="echo">
-        <div class="settingDescription">Vain toistaa, mitä kuulee. Ei käytä ChatGPT:tä.</div>
+        <div class="settingDescription">{{ t('echoDescription') }}</div>
       </div>
     </div>
 
@@ -40,7 +40,7 @@
         v-if="beginChatButtonShown"
         @click="beginChat"
       >
-        Aloita keskustelu
+        {{ t('Begin chat') }}
       </button>
       <button
         class="largeButton"
@@ -49,7 +49,7 @@
         :disabled="!startButtonEnabled"
         @click="startRecording"
       >
-        Aloita nauhoitus
+        {{ t('Start recording') }}
       </button>
       <button
         class="largeButton"
@@ -58,7 +58,7 @@
         :disabled="!stopButtonEnabled"
         @click="stopRecording"
         >
-        Lopeta nauhoitus
+          {{ t('Stop recording') }}
       </button>
     </p>
     <div id="chatBox">
@@ -88,7 +88,7 @@ const stopButtonEnabled = ref(true)
 const character = ref('teacher')
 const age = ref(3)
 const echo = ref(false)
-const instructions = ref('Tämä on äänikäyttöliittymä OpenAI:n ChatGPT:lle. Suunnattu lähinnä lapsille, koska tekstikäyttöliittymä on hieman hankala, jos ei osaa vielä lukea tai kirjoittaa.')
+const instructions  = ref('')
 let audioContext: any
 let mediaRecorder: any
 let sessionId = ''
@@ -117,6 +117,7 @@ watch(currentLanguage, function(newValue) {
   console.log(availableLocales)
   console.log(locale.value)
   locale.value = localeCode
+  instructions.value = t('basicInstructions')
 })
 
 function setState(newState: string) {
@@ -129,35 +130,30 @@ function setState(newState: string) {
   */
   console.log('setState:', newState)
   state = newState
+  statusText.value = t(state)
   if (state == 'playback') {
     beginChatButtonShown.value = false
     startButtonShown.value = true
     startButtonEnabled.value = false
     stopButtonShown.value = false
-    statusText.value = 'Odota'
   } else if (state == 'ready') {
     beginChatButtonShown.value = false
     startButtonShown.value = true
     startButtonEnabled.value = true
-    statusText.value = 'Valmis'
     statusClass.value = 'white-bg'
   } else if (state == 'recording') {
     startButtonShown.value = false
     stopButtonShown.value = true
     stopButtonEnabled.value = true
-    statusText.value = 'Tallennus käynnissä'
     statusClass.value = 'red-bg'
   } else if (state == 'processing') {
     stopButtonEnabled.value = false
-    statusText.value = 'Odota hetki, kun mietin.'
     statusClass.value = 'white-bg'
   } else if (state == 'error') {
-    statusText.value = 'Virhetilanne'
     statusClass.value = 'red-bg'
     startButtonEnabled.value = false
   } else {
     console.warn('Unknown state:', state)
-    statusText.value = state
     statusClass.value = 'red-bg'
   }
 }

@@ -1,5 +1,19 @@
 {
   "About": "Tietoja",
+  "Age of child": "Lapsen ikä",
+  "basicInstructions": "Tämä on äänikäyttöliittymä OpenAI:n ChatGPT:lle. Suunnattu lähinnä lapsille, koska tekstikäyttöliittymä on hieman hankala, jos ei osaa vielä lukea tai kirjoittaa.",
+  "Begin chat": "Aloita keskustelu",
+  "Choose language": "Valitse kieli",
+  "Choose role": "Valitse rooli",
   "Echo": "Kaiutus",
-  "Front page": "Etusivu"
+  "echoDescription": "Vain toistaa, mitä kuulee. Ei käytä ChatGPT:tä.",
+  "error": "Virhetilanne",
+  "Front page": "Etusivu",
+  "Kindergarten teacher": "Päiväkodin opettaja",
+  "No role": "Ei roolia",
+  "playback": "Odota",
+  "processing": "Odota hetki, kun mietin",
+  "ready": "Valmis",
+  "recording": "Tallennus käynnissä",
+  "Start recording": "Aloita nauhoitus"
 }

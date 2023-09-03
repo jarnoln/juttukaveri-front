@@ -1,5 +1,19 @@
 {
   "About": "About",
+  "Age of child": "Age of child",
+  "basicInstructions": "A voice interface for OpenAI ChatGPT. Aimed mostly for children since text interface can be tricky if you do not know how to read or write.",
+  "Begin chat": "Begin chat",
+  "Choose language": "Choose language",
+  "Choose role": "Choose role",
   "Echo": "Echo",
-  "Front page": "Front"
+  "echoDescription": "Only repeats back what hears. Does not use ChatGPT.",
+  "error": "Error",
+  "Front page": "Front",
+  "Kindergarten teacher": "Kindergarten teacher",
+  "No role": "No role",
+  "playback": "Wait",
+  "processing": "Wait a second while I think",
+  "ready": "Ready",
+  "recording": "Recording",
+  "Start recording": "Start recording"
 }
