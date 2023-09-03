@@ -27,7 +27,7 @@
         <input type="number" min="1" max="18" name="age" id="inputAge" v-model="age" />
       </div>
       <div class="settingRow">
-        <label for="echoCheckbox">Kaiutus</label>
+        <label for="echoCheckbox">{{ t('Echo') }}</label>
         <input type="checkbox" id="echoCheckbox" checked=false name="echo" v-model="echo">
         <div class="settingDescription">Vain toistaa, mitä kuulee. Ei käytä ChatGPT:tä.</div>
       </div>
@@ -73,6 +73,7 @@
 import { onBeforeMount, ref, watch } from 'vue'
 import { useContextStore } from '@/stores/context'
 import { apiClient } from '@/backend'
+import { useI18n } from 'vue-i18n'
 
 const contextStore = useContextStore()
 
@@ -94,6 +95,12 @@ let sessionId = ''
 let chunks: any[] = []
 let state = 'setup'
 let server = import.meta.env.VITE_BACKEND_URL
+
+const { t, locale, availableLocales } = useI18n({
+  inheritLocale: true,
+  useScope: 'global'
+})
+
 if (!server) {
   server = 'http://127.0.0.1:8000'
 }
@@ -106,6 +113,10 @@ onBeforeMount(() => {
 
 watch(currentLanguage, function(newValue) {
   contextStore.setLanguage(newValue)
+  const localeCode = newValue.split('-')[0]
+  console.log(availableLocales)
+  console.log(locale.value)
+  locale.value = localeCode
 })
 
 function setState(newState: string) {
