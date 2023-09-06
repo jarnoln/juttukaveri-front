@@ -2,19 +2,33 @@
   <div id="content">
     <h1>Juttukaveri</h1>
 
+    <p id="languageChoice">
+      <a href=""
+        @click.prevent="setCurrentLanguage('en-US')"
+        :class="{ 'selectedText': currentLanguage === 'en-US' }"
+      >English</a> |
+      <a href=""
+        @click.prevent="setCurrentLanguage('fi-FI')"
+        :class="{ 'selectedText': currentLanguage === 'fi-FI' }"
+      >Suomi</a> |
+      <a href=""
+        @click.prevent="setCurrentLanguage('cmn-CN')"
+        :class="{ 'selectedText': currentLanguage === 'cmn-CN' }"
+      >中文</a>
+    </p>
     <h2 id="statusText" :class="statusClass">{{ statusText }}</h2>
 
     <p id="instructions">{{ instructions }}</p>
 
     <div id="settings" v-if="state === 'setup'" class="settingsTable">
-      <div class="settingRow">
+      <!-- <div class="settingRow">
         <label for="selectLanguageMenu">{{ t('Choose language') }}:</label>
         <select name="language" id="selectLanguageMenu" v-model="currentLanguage">
           <option value="fi-FI">Suomi</option>
           <option value="en-US">English</option>
           <option value="cmn-CN">Mandarin</option>
         </select>
-      </div>
+      </div> -->
       <div class="settingRow">
         <label for="selectCharacterMenu">{{ t('Choose role') }}:</label>
         <select name="character" id="selectCharacterMenu" v-model="character">
@@ -62,7 +76,7 @@
       </button>
     </p>
     <div id="chatBox">
-      <p v-for="line in contextStore.chatLog" :class="line.type">
+      <p v-for="(line, index) in contextStore.chatLog" :key="'line_' + index" :class="line.type">
         {{ line.text }}
       </p>
     </div>
@@ -105,11 +119,14 @@ if (!server) {
   server = 'http://127.0.0.1:8000'
 }
 
-
 onBeforeMount(() => {
   currentLanguage.value = 'fi-FI'
   contextStore.setLanguage('fi-FI')
 })
+
+function setCurrentLanguage(code: string) {
+  currentLanguage.value = code
+}
 
 watch(currentLanguage, function(newValue) {
   contextStore.setLanguage(newValue)
@@ -342,6 +359,28 @@ button:disabled {
 .transcribed {
   background-color: #eeeeee;
   font-size: large;
+}
+
+#languageChoice {
+  text-align: center;
+}
+
+.selectedText {
+  font-weight: bold;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+  padding: 1rem;
+}
+
+a:visited {
+  color:  black;
+}
+
+a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 #startButton, #beginChatButton {
