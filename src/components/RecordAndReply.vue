@@ -217,10 +217,7 @@ function beginChat() {
   setState('playback')
   playGreeting();
   startSession();
-  instructions.value = `Paina alla olevaa nappia aloittaaksesi nauhoituksen ja kun olet valmis, paina
-      pysäytysnappia lopettaaksesi nauhoituksen. Vaihtoehtoisesti voit aloittaa nauhoituksen painamalla välilyönnin
-      pohjaan ja päästää sen ylös, kun olet valmis. Sen jälkeen tallenne lähetetään ChatGPT:lle ja jonkin ajan kuluttua
-      pitäisi kuulua vastaus.`
+  instructions.value = t('playbackInstructions')
   contextStore.initializeContext(character.value, age.value)
 }
 
