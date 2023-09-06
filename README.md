@@ -1,6 +1,6 @@
 # juttukaveri-front
 
-Frontend for [Juttukaveri]("https://juttukaveri.com")
+Frontend for [Juttukaveri](https://juttukaveri.com).
 
 [Backend](https://github.com/jarnoln/juttukaveri)
 
