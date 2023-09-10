@@ -186,6 +186,7 @@ function startSession() {
   const formData = new FormData()
   formData.append('ip',clientIP)
   console.log('startSession path:', path)
+  console.log('startSession data:', formData)
   fetch(server + path, {
     method: 'POST',
     body: formData,
