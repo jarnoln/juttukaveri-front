@@ -78,7 +78,7 @@
 <script setup lang="ts">
 import { onBeforeMount, ref, watch } from 'vue'
 import { useContextStore } from '@/stores/context'
-import { apiClient } from '@/backend'
+// import { apiClient } from '@/backend'
 import { useI18n } from 'vue-i18n'
 
 const contextStore = useContextStore()
@@ -184,13 +184,19 @@ function playResponseEnded() {
 function startSession() {
   const path = '/api01/start_session'
   const formData = new FormData()
-  formData.append('ip', clientIP)
+  formData.append('ip',clientIP)
   console.log('startSession path:', path)
-  apiClient.post(path, formData)
+  fetch(server + path, {
+    method: 'POST',
+    body: formData,
+  })
   .then(function(response) {
     console.log(response)
-    console.log(response.data)
-    sessionId = response.data['id']
+    return response.json()
+  })
+  .then(function(data) {
+    console.log(data)
+    sessionId = data['id']
     console.log('sessionId', sessionId)
   })
 }
