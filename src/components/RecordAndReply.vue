@@ -21,14 +21,6 @@
     <p id="instructions">{{ instructions }}</p>
 
     <div id="settings" v-if="state === 'setup'" class="settingsTable">
-      <!-- <div class="settingRow">
-        <label for="selectLanguageMenu">{{ t('Choose language') }}:</label>
-        <select name="language" id="selectLanguageMenu" v-model="currentLanguage">
-          <option value="fi-FI">Suomi</option>
-          <option value="en-US">English</option>
-          <option value="cmn-CN">Mandarin</option>
-        </select>
-      </div> -->
       <div class="settingRow">
         <label for="selectCharacterMenu">{{ t('Choose role') }}:</label>
         <select name="character" id="selectCharacterMenu" v-model="character">
@@ -109,6 +101,7 @@ let sessionId = ''
 let chunks: any[] = []
 let state = 'setup'
 let server = import.meta.env.VITE_BACKEND_URL
+let clientIP = ''
 
 const { t, locale, availableLocales } = useI18n({
   inheritLocale: true,
@@ -122,6 +115,15 @@ if (!server) {
 onBeforeMount(() => {
   currentLanguage.value = 'fi-FI'
   contextStore.setLanguage('fi-FI')
+  fetch('https://api64.ipify.org?format=json')
+  .then(response => response.json())
+  .then(data => {
+    clientIP = data.ip; // This contains the client's IP address
+    console.log(`Client IP address: ${clientIP}`);
+  })
+  .catch(error => {
+    console.error('Error fetching client IP:', error);
+  });
 })
 
 function setCurrentLanguage(code: string) {
@@ -182,6 +184,7 @@ function playResponseEnded() {
 function startSession() {
   const path = '/api01/start_session'
   const formData = new FormData()
+  formData.append('ip', clientIP)
   console.log('startSession path:', path)
   apiClient.post(path, formData)
   .then(function(response) {
