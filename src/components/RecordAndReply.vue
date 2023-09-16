@@ -20,6 +20,8 @@
 
     <p id="instructions">{{ instructions }}</p>
 
+    <p v-if="sessionId"> {{ t('Replies today') }}: {{ replyCount }} / 10</p>
+
     <div id="settings" v-if="state === 'setup'" class="settingsTable">
       <div class="settingRow">
         <label for="selectCharacterMenu">{{ t('Choose role') }}:</label>
@@ -95,6 +97,8 @@ const character = ref('teacher')
 const age = ref(3)
 const echo = ref(false)
 const instructions  = ref('')
+const replyCount = ref(0)
+
 let audioContext: any
 let mediaRecorder: any
 let sessionId = ''
@@ -198,7 +202,19 @@ function startSession() {
   .then(function(data) {
     console.log(data)
     sessionId = data['id']
+    replyCount.value = parseInt(data['repliesToday'])
     console.log('sessionId', sessionId)
+    if (sessionId === '') {
+      console.warn('No session ID received')
+      console.log(data['message'])
+      setState('error')
+      statusText.value = data['message']
+    }
+  })
+  .catch(function(error) {
+    console.error('Error:', error);
+    setState('error')
+    statusText.value = 'Error starting dession:' + error
   })
 }
 
@@ -268,6 +284,7 @@ function submitRecording(audioBlob: Blob) {
     setState('playback')
     playResponse(data['audioUrl']);
     console.log(contextStore.messages);
+    replyCount.value = replyCount.value + 1
   })
   .catch(function(error) {
     console.error('Error:', error);
