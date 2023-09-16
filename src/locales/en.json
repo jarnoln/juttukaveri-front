@@ -5,6 +5,7 @@
   "Begin chat": "Begin conversation",
   "Choose language": "Choose language",
   "Choose role": "Choose role",
+  "Daily message count exceeded": "Daily message count exceeded. You can come back tomorrow.",
   "Echo": "Echo",
   "echoDescription": "Only repeats back what hears. Does not use ChatGPT.",
   "error": "Error",

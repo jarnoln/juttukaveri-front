@@ -20,7 +20,7 @@
 
     <p id="instructions">{{ instructions }}</p>
 
-    <p v-if="sessionId"> {{ t('Replies today') }}: {{ replyCount }} / 10</p>
+    <p v-if="sessionId || replyCount > 0"> {{ t('Replies today') }}: {{ replyCount }} / 10</p>
 
     <div id="settings" v-if="state === 'setup'" class="settingsTable">
       <div class="settingRow">
@@ -175,6 +175,7 @@ function setState(newState: string) {
   } else if (state == 'error') {
     statusClass.value = 'red-bg'
     startButtonEnabled.value = false
+    beginChatButtonShown.value = false
   } else {
     console.warn('Unknown state:', state)
     statusClass.value = 'red-bg'
@@ -182,16 +183,19 @@ function setState(newState: string) {
 }
 
 function playResponseEnded() {
-  setState('ready')
+  if (replyCount.value < 10) {
+    setState('ready')
+  } else {
+    setState('error')
+    statusText.value = t('Daily message count exceeded')
+  }
 }
 
 function startSession() {
   const path = '/api01/start_session'
   const formData = new FormData()
   formData.append('ip',clientIP)
-  console.log('startSession path:', path)
-  console.log('startSession data:', formData)
-  fetch(server + path, {
+  return fetch(server + path, {
     method: 'POST',
     body: formData,
   })
@@ -208,7 +212,11 @@ function startSession() {
       console.warn('No session ID received')
       console.log(data['message'])
       setState('error')
-      statusText.value = data['message']
+      statusText.value = t(data['message'])
+    } else {
+      playGreeting();
+      instructions.value = t('playbackInstructions')
+      contextStore.initializeContext(character.value, age.value)
     }
   })
   .catch(function(error) {
@@ -218,7 +226,7 @@ function startSession() {
   })
 }
 
-function playGreeting() {
+async function playGreeting() {
   let audioUrl = 'https://public-bucket-jk.s3.eu-central-1.amazonaws.com/hello_who_are_you.mp3'
   if (currentLanguage.value === 'fi-FI') {
     audioUrl = 'https://public-bucket-jk.s3.eu-central-1.amazonaws.com/hei_kuka_sina_olet.mp3'
@@ -229,7 +237,7 @@ function playGreeting() {
   audio.play()
 }
 
-function playWaitASecond() {
+async function playWaitASecond() {
   let audioUrl = 'https://public-bucket-jk.s3.eu-central-1.amazonaws.com/hmm_en.mp3'
   if (currentLanguage.value === 'fi-FI') {
     audioUrl = 'https://public-bucket-jk.s3.eu-central-1.amazonaws.com/odota_hetki_kun_mietin.mp3'
@@ -247,10 +255,7 @@ function playResponse(audioUrl: string) {
 function beginChat() {
   console.log('beginChat')
   setState('playback')
-  playGreeting();
-  startSession();
-  instructions.value = t('playbackInstructions')
-  contextStore.initializeContext(character.value, age.value)
+  startSession()
 }
 
 function submitRecording(audioBlob: Blob) {

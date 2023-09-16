@@ -5,6 +5,7 @@
   "Begin chat": "Aloita keskustelu",
   "Choose language": "Valitse kieli",
   "Choose role": "Valitse rooli",
+  "Daily message count exceeded": "Päivittäinen viestimäärä ylitetty. Voit jatkaa taas huomenna.",
   "Echo": "Kaiutus",
   "echoDescription": "Vain toistaa, mitä kuulee. Ei käytä ChatGPT:tä.",
   "error": "Virhetilanne",
