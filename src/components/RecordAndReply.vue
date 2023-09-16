@@ -203,7 +203,10 @@ function startSession() {
 }
 
 function playGreeting() {
-  const audioUrl = 'https://public-bucket-jk.s3.eu-central-1.amazonaws.com/hei_kuka_sina_olet.mp3'
+  let audioUrl = 'https://public-bucket-jk.s3.eu-central-1.amazonaws.com/hello_who_are_you.mp3'
+  if (currentLanguage.value === 'fi-FI') {
+    audioUrl = 'https://public-bucket-jk.s3.eu-central-1.amazonaws.com/hei_kuka_sina_olet.mp3'
+  }
   const audio = new Audio(audioUrl)
   startButtonEnabled.value = false
   audio.addEventListener('ended', playResponseEnded)
@@ -211,7 +214,10 @@ function playGreeting() {
 }
 
 function playWaitASecond() {
-  const audioUrl = 'https://public-bucket-jk.s3.eu-central-1.amazonaws.com/odota_hetki_kun_mietin.mp3'
+  let audioUrl = 'https://public-bucket-jk.s3.eu-central-1.amazonaws.com/hmm_en.mp3'
+  if (currentLanguage.value === 'fi-FI') {
+    audioUrl = 'https://public-bucket-jk.s3.eu-central-1.amazonaws.com/odota_hetki_kun_mietin.mp3'
+  }
   const audio = new Audio(audioUrl)
   audio.play()
 }
