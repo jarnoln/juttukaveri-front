@@ -282,6 +282,14 @@ function submitRecording(audioBlob: Blob) {
     const transcription = data['transcript']
     const responseText = data['responseText']
     console.log('Transcription:', transcription)
+    if (!transcription && !responseText) {
+      const message = data['message']
+      if (message) {
+        setState('error')
+        statusText.value = message
+        return
+      }
+    }
     contextStore.addChatLine({ type: 'transcribed', text: transcription })
     contextStore.addChatLine({ type: 'response', text: responseText })
     contextStore.addMessage({ 'role': 'user', 'content': transcription })
